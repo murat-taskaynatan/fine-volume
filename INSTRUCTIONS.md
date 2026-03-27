@@ -26,6 +26,7 @@ cp -R "dist/Logi Fine Volume Up.app" /Applications/
 - `Logi Fine Volume Up.app` raises output volume by `2`
 - volume is clamped between `0` and `100`
 - the apps unmute output when adjusting volume
+- the generated apps are background-only to reduce frontmost-window flicker
 
 ## Change the amount
 
@@ -51,3 +52,4 @@ Then rebuild:
 - If Logi Options+ does not show the generated apps, use the copies in `/Applications`.
 - If a key beeps, it is probably still assigned to a keystroke shortcut instead of an application action.
 - If the volume changes by the normal large step, the key is still mapped to Logitech's default media control.
+- If the active window blinks, replace older generated apps with a fresh build from this version of the repo.

@@ -19,6 +19,8 @@ Some Logitech keyboards on macOS, including MX-series devices, send media keys t
 
 This repo avoids that path by letting Logi Options+ launch small apps directly.
 
+The generated apps are background-only bundles. They do not use the AppleScript applet runtime, which helps avoid the visible blink/focus disturbance that can happen when launching hidden AppleScript apps repeatedly.
+
 ## Repo layout
 
 - `src/fine_volume_down.applescript`
@@ -30,7 +32,7 @@ This repo avoids that path by letting Logi Options+ launch small apps directly.
 
 - macOS
 - Logi Options+
-- `osacompile` available on the system
+- `osascript` available on the system
 
 ## Build
 
@@ -109,6 +111,7 @@ After assigning the apps in Logi Options+:
 - If Logi Options+ cannot find the apps, copy them to `/Applications`.
 - If the button still behaves like normal macOS volume, make sure the key is assigned to the helper app and not to the default media action.
 - If nothing happens, try launching the generated app manually from Finder once to confirm macOS allows it to run.
+- If the active window blinks when a helper runs, rebuild with the current version of this repo and replace the older helper apps. Older builds used AppleScript applets, which were more likely to disturb the frontmost app.
 - If you changed the scripts, rebuild before retesting.
 
 ## Step-by-step guide
