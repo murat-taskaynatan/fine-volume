@@ -1,4 +1,4 @@
-# logi-fine-volume
+# Logi Fine Volume
 
 Fine-grained macOS volume control for Logitech keyboards using Logi Options+.
 
