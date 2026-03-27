@@ -10,6 +10,7 @@ func clamp(_ value: Int) -> Int {
 let hudNotificationName = Notification.Name("com.murat-taskaynatan.logi-fine-volume.hud-update")
 let hudPIDFile = URL(fileURLWithPath: NSTemporaryDirectory())
   .appendingPathComponent("com.murat-taskaynatan.logi-fine-volume.hud.pid")
+let hudHideDelay: TimeInterval = 1.8
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
   private let initialVolume: Int?
@@ -106,15 +107,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       defer: false
     )
     panel.isFloatingPanel = true
-    panel.level = .statusBar
-    panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient, .ignoresCycle]
+    panel.level = .floating
+    panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]
     panel.backgroundColor = .clear
     panel.isOpaque = false
-    panel.hasShadow = true
+    panel.hasShadow = false
     panel.hidesOnDeactivate = false
     panel.ignoresMouseEvents = true
     panel.isMovable = false
     panel.isReleasedWhenClosed = false
+    panel.animationBehavior = .none
     panel.alphaValue = 1
 
     let contentView = NSView(frame: NSRect(origin: .zero, size: panelSize))
@@ -167,11 +169,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       return
     }
 
-    let panelSize = panel.frame.size
-    panel.setFrameOrigin(panelOrigin(for: panelSize))
-
     if !panel.isVisible {
       panel.alphaValue = 1
+      let panelSize = panel.frame.size
+      panel.setFrameOrigin(panelOrigin(for: panelSize))
       panel.orderFrontRegardless()
     }
 
@@ -180,7 +181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       panel?.orderOut(nil)
     }
     self.hideWorkItem = hideWorkItem
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.72, execute: hideWorkItem)
+    DispatchQueue.main.asyncAfter(deadline: .now() + hudHideDelay, execute: hideWorkItem)
   }
 }
 
