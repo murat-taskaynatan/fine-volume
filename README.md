@@ -7,7 +7,7 @@ This project builds two tiny macOS helper apps:
 - `Logi Fine Volume Down.app`
 - `Logi Fine Volume Up.app`
 
-Each app changes the system output volume by an exact step. This avoids relying on Logitech media keys being intercepted correctly by Karabiner.
+Each app changes the system output volume by an exact step and shows a small custom HUD. This avoids relying on Logitech media keys being intercepted correctly by Karabiner.
 
 ## Why this exists
 
@@ -33,6 +33,7 @@ The generated apps are background-only bundles. They do not use the AppleScript 
 - macOS
 - Logi Options+
 - `osascript` available on the system
+- `xcrun swiftc` available on the system
 
 ## Build
 
@@ -48,6 +49,11 @@ The generated apps will be written to:
 dist/Logi Fine Volume Down.app
 dist/Logi Fine Volume Up.app
 ```
+
+Each generated app contains:
+
+- an AppleScript that sets the new exact volume
+- a small background HUD binary that displays the current volume percentage
 
 ## Install
 
@@ -105,6 +111,7 @@ After assigning the apps in Logi Options+:
 - press volume up once and confirm the system volume increases by a small exact amount
 - press volume down once and confirm it decreases by the same amount
 - confirm there is no repeated beep from a failed keyboard shortcut
+- confirm a small custom volume HUD appears without stealing focus
 
 ## Troubleshooting
 

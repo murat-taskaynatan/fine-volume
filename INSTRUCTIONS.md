@@ -27,6 +27,7 @@ cp -R "dist/Logi Fine Volume Up.app" /Applications/
 - volume is clamped between `0` and `100`
 - the apps unmute output when adjusting volume
 - the generated apps are background-only to reduce frontmost-window flicker
+- the apps show a small custom volume HUD because the built-in macOS media overlay is not available through this workaround
 
 ## Change the amount
 
