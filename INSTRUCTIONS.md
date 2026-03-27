@@ -30,6 +30,13 @@ After the helper launches, use its menu bar icon to:
 - enable or disable fine-volume hotkeys
 - enable or disable the custom overlay
 
+Why this helper is needed:
+
+- Logi Options+ usually intercepts the Logitech button first instead of passing a clean raw event straight to macOS
+- a plain keystroke assignment is not enough on its own because macOS needs a running app to listen for that shortcut
+- Karabiner is unreliable here because it often does not receive a stable original hardware event from the Logitech side
+- this helper is the listener that catches the Logi shortcut and changes volume directly
+
 ## What the helper does
 
 - `Control + Option + Command + J` lowers output volume by the configured step

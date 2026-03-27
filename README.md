@@ -22,6 +22,72 @@ This repo avoids that path by using a local background helper instead of Logitec
 
 The generated helper apps are native Swift bundles. They do not use the AppleScript applet runtime, which helps avoid the visible blink and focus disturbance that can happen when launching hidden AppleScript apps repeatedly.
 
+## Beginner Explanation
+
+If you are using something like an MX Creative Console, MX Keys, or another Logitech device that is managed by Logi Options+, the important detail is this:
+
+your button press usually does **not** go straight from the keyboard into macOS as a simple raw key that other tools can reliably remap.
+
+Instead, the path often looks more like this:
+
+1. You press a Logitech button.
+2. Logi Options+ receives that button press first.
+3. Logi Options+ decides what to emit next:
+   - a normal media action
+   - a custom keystroke
+   - a Smart Action
+   - an app launch
+4. macOS only sees the result of that Logitech step.
+
+That extra Logitech layer is why the usual solutions break down.
+
+### Why a normal keystroke assignment is not enough
+
+You can tell Logi Options+ to send a shortcut like `Control + Option + Command + J`, but that shortcut does nothing by itself.
+
+macOS still needs **some running app** to listen for that shortcut and decide what to do with it.
+
+Without a listener:
+
+- the shortcut is just an unused key combo
+- macOS treats it like an unhandled shortcut
+- you often hear a beep
+- volume does not change
+
+So the keystroke assignment is only half of the solution. This repo provides the other half: the small background helper that listens for the shortcut and then changes the volume directly.
+
+### Why Karabiner usually does not solve it here
+
+Karabiner works best when it can see the **original hardware event**.
+
+For many Logitech media buttons and console actions, that is not what happens. Logi Options+ often intercepts the device input first and turns it into some other software-level action before Karabiner gets a reliable raw event to remap.
+
+In practice, that leads to problems like:
+
+- Karabiner never sees the real original key event
+- media buttons still do the default big macOS volume step
+- custom remaps work inconsistently or only sometimes
+- one Logitech action can drift into another when Smart Actions are involved
+
+That is why this repo does **not** depend on Karabiner for the actual volume logic.
+
+### Why this tool works
+
+This helper takes the most stable part of the Logitech path and keeps the rest under local control:
+
+1. Logi Options+ sends one simple keystroke combo.
+2. `Logi Fine Volume Hotkeys.app` catches that combo.
+3. The helper changes macOS volume directly by the exact step you configured.
+4. The helper optionally shows its own overlay.
+
+That means:
+
+- Logitech only has to emit a shortcut
+- the volume math is done locally and predictably
+- you get exact small steps
+- you do not need Karabiner to understand the Logitech hardware event
+- you can enable or disable the hotkeys and overlay from the menu bar
+
 ## Repo layout
 
 - `src/volume_common.swift`
