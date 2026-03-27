@@ -107,6 +107,8 @@ create_app \
   "$DIST_DIR/Logi Fine Volume Hotkeys.app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Add :LFVUpStep integer $UP_STEP" \
   "$DIST_DIR/Logi Fine Volume Hotkeys.app/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :LFVStepSizeDefault integer $STEP_SIZE" \
+  "$DIST_DIR/Logi Fine Volume Hotkeys.app/Contents/Info.plist"
 
 cat >"$DIST_DIR/$LAUNCH_AGENT_ID.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>

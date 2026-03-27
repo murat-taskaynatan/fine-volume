@@ -153,6 +153,7 @@ The menu provides:
 
 - `Enable Fine Volume` to turn the global hotkeys on or off
 - `Show Overlay` to enable or disable the custom volume HUD
+- `Step Size` to choose the live volume increment used by the hotkeys
 
 Those settings persist between launches because the helper stores them in a shared preferences domain.
 
@@ -172,7 +173,15 @@ If you still want the old app-launch path, assign the down and up apps directly 
 
 ## Change the step size
 
-Edit `STEP_SIZE` in:
+For normal use, change it from the helper's menu bar icon:
+
+1. Open the `Logi Fine Volume` menu bar menu.
+2. Open `Step Size`.
+3. Pick the increment you want.
+
+The change applies immediately to the hotkeys and is saved for future launches.
+
+If you want to change the default used by newly built helpers, edit `STEP_SIZE` in:
 
 - `scripts/build_apps.sh`
 
@@ -192,6 +201,7 @@ After assigning the hotkeys in Logi Options+:
 - confirm a small custom volume HUD appears
 - confirm the helper shows a menu bar icon
 - confirm the menu bar toggles can disable hotkeys and the overlay independently
+- confirm the `Step Size` menu changes the amount immediately
 
 ## Troubleshooting
 
@@ -199,6 +209,7 @@ After assigning the hotkeys in Logi Options+:
 - If the volume still behaves like the normal large macOS step, make sure the MX Keys buttons are assigned to the keystrokes above rather than the default media action.
 - If nothing happens, launch `Logi Fine Volume Hotkeys.app` manually once from `~/Applications` and try again.
 - If the overlay does not appear, make sure `Show Overlay` is enabled from the menu bar icon.
+- If the volume amount is wrong, check the helper's `Step Size` menu instead of only checking the build script.
 - If you changed `STEP_SIZE`, rebuild and reinstall the generated app and LaunchAgent plist.
 
 ## Step-by-step guide

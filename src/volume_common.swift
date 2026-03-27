@@ -16,6 +16,11 @@ let logFileURL = FileManager.default.homeDirectoryForCurrentUser
 let settingsSuiteName = "com.murat-taskaynatan.logi-fine-volume.shared"
 let hotkeysEnabledKey = "hotkeys_enabled"
 let overlayEnabledKey = "overlay_enabled"
+let stepSizeKey = "step_size"
+
+func normalizedStepSize(_ value: Int) -> Int {
+  max(1, min(10, value))
+}
 
 func sharedDefaults() -> UserDefaults {
   UserDefaults(suiteName: settingsSuiteName) ?? .standard
@@ -29,6 +34,7 @@ func registerSharedDefaults() {
   sharedDefaults().register(defaults: [
     hotkeysEnabledKey: true,
     overlayEnabledKey: true,
+    stepSizeKey: normalizedStepSize(Bundle.main.object(forInfoDictionaryKey: "LFVStepSizeDefault") as? Int ?? 2),
   ])
 }
 
@@ -51,6 +57,17 @@ func fineVolumeOverlayEnabled() -> Bool {
 func setFineVolumeOverlayEnabled(_ enabled: Bool) {
   let defaults = sharedDefaults()
   defaults.set(enabled, forKey: overlayEnabledKey)
+  synchronizeSharedDefaults()
+}
+
+func fineVolumeStepSize() -> Int {
+  registerSharedDefaults()
+  return normalizedStepSize(sharedDefaults().integer(forKey: stepSizeKey))
+}
+
+func setFineVolumeStepSize(_ stepSize: Int) {
+  let defaults = sharedDefaults()
+  defaults.set(normalizedStepSize(stepSize), forKey: stepSizeKey)
   synchronizeSharedDefaults()
 }
 

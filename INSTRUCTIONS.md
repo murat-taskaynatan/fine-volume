@@ -29,6 +29,7 @@ After the helper launches, use its menu bar icon to:
 
 - enable or disable fine-volume hotkeys
 - enable or disable the custom overlay
+- change the live step size used by the hotkeys
 
 Why this helper is needed:
 
@@ -49,13 +50,19 @@ Why this helper is needed:
 
 ## Change the amount
 
-Edit:
+For day-to-day use, change the amount from the helper's menu bar icon:
+
+1. Open `Logi Fine Volume` in the menu bar.
+2. Open `Step Size`.
+3. Choose the percentage you want.
+
+That change applies immediately and is saved.
+
+If you want to change the build-time default for new installs, edit:
 
 - [build_apps.sh](scripts/build_apps.sh)
 
-Change `STEP_SIZE`.
-
-Then rebuild:
+Change `STEP_SIZE`, then rebuild:
 
 ```sh
 ./scripts/build_apps.sh
@@ -67,4 +74,5 @@ Then rebuild:
 - If the volume changes by the normal large step, the key is still mapped to Logitech's default media control.
 - If nothing happens, open `~/Applications/Logi Fine Volume Hotkeys.app` manually once and try again.
 - If the overlay does not appear, check the helper's menu bar icon and make sure `Show Overlay` is enabled.
+- If the hotkeys work but the amount is wrong, check the helper's `Step Size` menu.
 - If you change `STEP_SIZE`, rebuild and reinstall both the app and the LaunchAgent plist.
