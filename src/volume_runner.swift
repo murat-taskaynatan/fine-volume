@@ -1,9 +1,14 @@
 import AppKit
+import Darwin
 import Foundation
 
 func clamp(_ value: Int) -> Int {
   max(0, min(100, value))
 }
+
+let hudNotificationName = Notification.Name("com.murat-taskaynatan.logi-fine-volume.hud-update")
+let hudPIDFile = URL(fileURLWithPath: NSTemporaryDirectory())
+  .appendingPathComponent("com.murat-taskaynatan.logi-fine-volume.hud.pid")
 
 func adjustedVolume(step: Int) throws -> Int {
   let operation = step >= 0 ? "+" : "-"
@@ -39,7 +44,31 @@ func adjustedVolume(step: Int) throws -> Int {
   throw NSError(domain: "logi-fine-volume", code: 2)
 }
 
-func spawnHUD(volume: Int) {
+func processExists(pid: Int32) -> Bool {
+  guard pid > 0 else {
+    return false
+  }
+
+  if kill(pid, 0) == 0 {
+    return true
+  }
+
+  return errno == EPERM
+}
+
+func hudServiceIsRunning() -> Bool {
+  guard
+    let pidText = try? String(contentsOf: hudPIDFile, encoding: .utf8)
+      .trimmingCharacters(in: .whitespacesAndNewlines),
+    let pid = Int32(pidText)
+  else {
+    return false
+  }
+
+  return processExists(pid: pid)
+}
+
+func launchHUDService(initialVolume: Int) {
   guard let bundleURL = Bundle.main.bundleURL as URL? else {
     return
   }
@@ -51,13 +80,30 @@ func spawnHUD(volume: Int) {
 
   let process = Process()
   process.executableURL = executableURL
-  process.arguments = ["\(volume)"]
+  process.arguments = ["--service", "\(initialVolume)"]
   process.standardOutput = nil
   process.standardError = nil
   try? process.run()
 }
 
+func postHUDUpdate(volume: Int) {
+  DistributedNotificationCenter.default().postNotificationName(
+    hudNotificationName,
+    object: nil,
+    userInfo: ["volume": volume],
+    deliverImmediately: true
+  )
+}
+
+func showHUD(volume: Int) {
+  if hudServiceIsRunning() {
+    postHUDUpdate(volume: volume)
+  } else {
+    launchHUDService(initialVolume: volume)
+  }
+}
+
 let step = Bundle.main.object(forInfoDictionaryKey: "LFVStep") as? Int ?? 0
 if step != 0, let volume = try? adjustedVolume(step: step) {
-  spawnHUD(volume: volume)
+  showHUD(volume: volume)
 }
