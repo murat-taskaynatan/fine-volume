@@ -2,77 +2,121 @@
 
 ## Quick setup
 
-1. Build the helper apps:
+1. Build the tools:
 
 ```sh
 ./scripts/build_apps.sh
 ```
 
-2. Install the hotkey helper:
+2. Install the menu bar helper:
 
 ```sh
-cp -R "dist/Logi Fine Volume Hotkeys.app" "$HOME/Applications/"
+cp -R "dist/Fine Volume Hotkeys.app" "$HOME/Applications/"
 mkdir -p "$HOME/Library/LaunchAgents"
-cp "dist/com.murat-taskaynatan.logi-fine-volume.hotkeys.plist" "$HOME/Library/LaunchAgents/"
-launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.murat-taskaynatan.logi-fine-volume.hotkeys.plist"
-launchctl kickstart -k "gui/$(id -u)/com.murat-taskaynatan.logi-fine-volume.hotkeys"
+cp "dist/com.murat-taskaynatan.fine-volume.hotkeys.plist" "$HOME/Library/LaunchAgents/"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.murat-taskaynatan.fine-volume.hotkeys.plist"
+launchctl kickstart -k "gui/$(id -u)/com.murat-taskaynatan.fine-volume.hotkeys"
 ```
 
-3. Open Logi Options+.
-4. Select your Logitech keyboard.
-5. Change the `Volume Down` button action to `Keystroke Assignment`.
-6. Record `Control + Option + Command + J`.
-7. Change the `Volume Up` button action to `Keystroke Assignment`.
-8. Record `Control + Option + Command + K`.
+3. If you want the CLI too:
 
-After the helper launches, use its menu bar icon to:
+```sh
+install -m 755 "dist/fine-volume" /usr/local/bin/fine-volume
+```
 
-- enable or disable fine-volume hotkeys
-- enable or disable the custom overlay
-- change the live step size used by the hotkeys
+If `/usr/local/bin` is not writable, install it to `~/bin/fine-volume` instead and point your controller software at that full path.
+
+## Logitech MX Creative Console or MX Keys
+
+1. Open Logi Options+.
+2. Select your device.
+3. Change `Volume Down` to `Keystroke Assignment`.
+4. Record `Control + Option + Command + J`.
+5. Change `Volume Up` to `Keystroke Assignment`.
+6. Record `Control + Option + Command + K`.
 
 Why this helper is needed:
 
-- Logi Options+ usually intercepts the Logitech button first instead of passing a clean raw event straight to macOS
-- a plain keystroke assignment is not enough on its own because macOS needs a running app to listen for that shortcut
-- Karabiner is unreliable here because it often does not receive a stable original hardware event from the Logitech side
-- this helper is the listener that catches the Logi shortcut and changes volume directly
+- Logi Options+ often intercepts the Logitech control before macOS sees a clean raw hardware event.
+- A plain keystroke assignment is only half the solution because macOS still needs a running app to listen for that shortcut.
+- Karabiner is unreliable here because it often does not receive a stable original Logitech event.
+- `Fine Volume Hotkeys.app` is the listener that catches the shortcut and changes volume directly.
+
+## Stream Deck or other consoles
+
+Pick one trigger style:
+
+### Send the hotkeys
+
+- `Control + Option + Command + J`
+- `Control + Option + Command + K`
+
+### Launch the helper apps
+
+```sh
+cp -R "dist/Fine Volume Down.app" "$HOME/Applications/"
+cp -R "dist/Fine Volume Up.app" "$HOME/Applications/"
+```
+
+Then point your console software at:
+
+- `~/Applications/Fine Volume Down.app`
+- `~/Applications/Fine Volume Up.app`
+
+### Run the CLI
+
+```sh
+fine-volume down
+fine-volume up
+```
+
+If your controller software does not inherit your shell `PATH`, use the full path to the binary instead of only `fine-volume`.
 
 ## What the helper does
 
-- `Control + Option + Command + J` lowers output volume by the configured step
-- `Control + Option + Command + K` raises output volume by the configured step
-- volume is clamped between `0` and `100`
-- the helper unmutes output when adjusting volume
-- the helper shows a small custom volume HUD because the built-in macOS media overlay is not available through this workaround
-- the helper runs at login through a user LaunchAgent
-- the helper shows a menu bar icon with persistent toggles for hotkeys and overlay display
+- changes output volume by the configured exact step
+- clamps volume between `0` and `100`
+- unmutes output when adjusting volume
+- can show a small custom volume HUD
+- runs at login through a user LaunchAgent
+- shows a menu bar icon with controls for hotkeys, overlay, step size, and shortcuts
 
 ## Change the amount
 
-For day-to-day use, change the amount from the helper's menu bar icon:
+From the menu bar:
 
-1. Open `Logi Fine Volume` in the menu bar.
+1. Open `Fine Volume`.
 2. Open `Step Size`.
 3. Choose the percentage you want.
 
-That change applies immediately and is saved.
-
-If you want to change the build-time default for new installs, edit:
-
-- [build_apps.sh](scripts/build_apps.sh)
-
-Change `STEP_SIZE`, then rebuild:
+From the CLI:
 
 ```sh
-./scripts/build_apps.sh
+fine-volume step-size 5
+```
+
+## Change the shortcuts
+
+From the menu bar:
+
+1. Open `Fine Volume`.
+2. Open `Shortcuts`.
+3. Choose the shortcut you want to change.
+4. Press the new shortcut.
+
+From the CLI:
+
+```sh
+fine-volume shortcut down Control+Option+Command+H
+fine-volume shortcut up Control+Option+Command+L
+fine-volume shortcuts reset
 ```
 
 ## Troubleshooting
 
-- If a key triggers the macOS alert sound, the hotkey helper is not running or the button is assigned to the wrong keystroke.
-- If the volume changes by the normal large step, the key is still mapped to Logitech's default media control.
-- If nothing happens, open `~/Applications/Logi Fine Volume Hotkeys.app` manually once and try again.
-- If the overlay does not appear, check the helper's menu bar icon and make sure `Show Overlay` is enabled.
-- If the hotkeys work but the amount is wrong, check the helper's `Step Size` menu.
-- If you change `STEP_SIZE`, rebuild and reinstall both the app and the LaunchAgent plist.
+- If a Logitech control triggers the macOS alert sound, the helper is not running or Logi Options+ is sending a different shortcut.
+- If the volume changes by the normal large step, the control is still mapped to the default media action.
+- If Karabiner works with the built-in keyboard but not the Logitech control, Logi Options+ probably intercepted the original event first.
+- If Stream Deck or another console can run shell commands cleanly, `fine-volume down` and `fine-volume up` are usually the most direct setup.
+- If the overlay does not appear, check the menu bar icon and make sure `Show Overlay` is enabled.
+- If the amount is wrong, use `fine-volume status` or check the helper's `Step Size` menu.

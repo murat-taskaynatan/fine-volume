@@ -7,9 +7,9 @@ func clamp(_ value: Int) -> Int {
   max(0, min(100, value))
 }
 
-let hudNotificationName = Notification.Name("com.murat-taskaynatan.logi-fine-volume.hud-update")
+let hudNotificationName = Notification.Name("com.murat-taskaynatan.fine-volume.hud-update")
 let hudPIDFile = URL(fileURLWithPath: NSTemporaryDirectory())
-  .appendingPathComponent("com.murat-taskaynatan.logi-fine-volume.hud.pid")
+  .appendingPathComponent("com.murat-taskaynatan.fine-volume.hud.pid")
 let hudHideDelay: TimeInterval = 1.8
 let hudPanelSize = NSSize(width: 300, height: 54)
 
