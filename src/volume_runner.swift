@@ -9,6 +9,56 @@ func clamp(_ value: Int) -> Int {
 let hudNotificationName = Notification.Name("com.murat-taskaynatan.logi-fine-volume.hud-update")
 let hudPIDFile = URL(fileURLWithPath: NSTemporaryDirectory())
   .appendingPathComponent("com.murat-taskaynatan.logi-fine-volume.hud.pid")
+let logFileURL = FileManager.default.homeDirectoryForCurrentUser
+  .appendingPathComponent("Library")
+  .appendingPathComponent("Logs")
+  .appendingPathComponent("logi-fine-volume.log")
+
+func currentTimestamp() -> String {
+  ISO8601DateFormatter().string(from: Date())
+}
+
+func appendLog(_ message: String) {
+  let line = "\(currentTimestamp()) \(message)\n"
+  let data = Data(line.utf8)
+
+  try? FileManager.default.createDirectory(
+    at: logFileURL.deletingLastPathComponent(),
+    withIntermediateDirectories: true
+  )
+
+  if let handle = try? FileHandle(forWritingTo: logFileURL) {
+    _ = try? handle.seekToEnd()
+    try? handle.write(contentsOf: data)
+    try? handle.close()
+  } else {
+    try? data.write(to: logFileURL, options: .atomic)
+  }
+}
+
+func currentVolume() throws -> Int {
+  let scriptSource = "return output volume of (get volume settings)"
+
+  var error: NSDictionary?
+  guard let script = NSAppleScript(source: scriptSource) else {
+    throw NSError(domain: "logi-fine-volume", code: 10)
+  }
+
+  let result = script.executeAndReturnError(&error)
+  if let error {
+    throw NSError(domain: "logi-fine-volume", code: 11, userInfo: error as? [String: Any])
+  }
+
+  if result.descriptorType == typeSInt32 || result.descriptorType == typeUInt32 {
+    return clamp(Int(result.int32Value))
+  }
+
+  if let stringValue = result.stringValue, let parsed = Int(stringValue) {
+    return clamp(parsed)
+  }
+
+  throw NSError(domain: "logi-fine-volume", code: 12)
+}
 
 func adjustedVolume(step: Int) throws -> Int {
   let operation = step >= 0 ? "+" : "-"
@@ -104,6 +154,19 @@ func showHUD(volume: Int) {
 }
 
 let step = Bundle.main.object(forInfoDictionaryKey: "LFVStep") as? Int ?? 0
-if step != 0, let volume = try? adjustedVolume(step: step) {
-  showHUD(volume: volume)
+let bundlePath = Bundle.main.bundlePath
+let bundleIdentifier = Bundle.main.bundleIdentifier ?? "unknown"
+
+appendLog("launch bundle=\(bundleIdentifier) path=\(bundlePath) step=\(step)")
+
+if step != 0 {
+  let beforeVolume = (try? currentVolume()) ?? -1
+  if let volume = try? adjustedVolume(step: step) {
+    appendLog("success bundle=\(bundleIdentifier) step=\(step) volume=\(beforeVolume)->\(volume)")
+    showHUD(volume: volume)
+  } else {
+    appendLog("failure bundle=\(bundleIdentifier) step=\(step)")
+  }
+} else {
+  appendLog("ignored bundle=\(bundleIdentifier) reason=zero_step")
 }
