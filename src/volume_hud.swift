@@ -131,10 +131,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     titleField.font = .systemFont(ofSize: 16, weight: .semibold)
     titleField.textColor = .white
     titleField.alignment = .left
-    titleField.frame = NSRect(x: 16, y: 18, width: 96, height: 18)
+    titleField.frame = NSRect(x: 16, y: 18, width: 104, height: 18)
     contentView.addSubview(titleField)
 
-    let track = NSView(frame: NSRect(x: 112, y: 21, width: 172, height: 10))
+    let track = NSView(frame: NSRect(x: 126, y: 21, width: 158, height: 10))
     track.wantsLayer = true
     track.layer?.backgroundColor = NSColor(calibratedWhite: 1.0, alpha: 0.16).cgColor
     track.layer?.cornerRadius = 5
@@ -158,7 +158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     CATransaction.begin()
     CATransaction.setDisableActions(true)
-    let fillWidth = max(10.0, floor(172.0 * CGFloat(volume) / 100.0))
+    let fillWidth = max(10.0, floor(158.0 * CGFloat(volume) / 100.0))
     fillView?.frame.size.width = fillWidth
     CATransaction.commit()
   }
